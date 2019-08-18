@@ -1,0 +1,19 @@
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  name: cumulusairlistings.cumulusair.com
+spec:
+  group: cumulusair.com
+  names:
+    kind: CumulusAirListingSvc
+    listKind: CumulusAirListingSvcList
+    plural: cumulusairlistingsvc
+    singular: cumulusairlistingsvc
+  scope: Namespaced
+  subresources:
+    status: {}
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true

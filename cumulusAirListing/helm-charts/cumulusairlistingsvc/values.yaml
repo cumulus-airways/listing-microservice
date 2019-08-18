@@ -1,0 +1,118 @@
+replicaCount: 2
+namespace: "kubeapp"
+metadata:
+ name: listing-svc
+ label: listing-svc
+readinessProbe:
+  path: /healthz
+  port: 7000
+  initialDelaySeconds: 10
+  timeoutSeconds: 2
+  periodSeconds: 10
+mongodb:
+  host: "mongodb.kubeapp"
+  port: "27017"
+  username: "YWRtaW4="
+  password: "YWRtaW4="
+  secret: "aGVsbG8="
+livenessProbe:
+  path: /healthz
+  port: 7000
+  initialDelaySeconds: 10
+  timeoutSeconds: 2
+  periodSeconds: 10
+image:
+  name: listing-svc
+  imageName: "listing-svc" 
+  imagePullPolicy: Always
+  ports:
+    containerPort: 7000
+  requests:
+    cpu: "50m"
+    memory: "200Mi"
+  limits:
+    cpu: "80m"
+    memory: "210Mi"
+  maxSurge: 1
+  maxUnavailable: 0
+  lifecycle:
+    preStop:
+      command: ["/bin/bash", "-c", "sleep 20"]
+
+
+envOfSecrets:
+  envMONGOUSERNAME:
+    name: MONGOUSERNAME
+    secretKeyRef:
+      name: listingmicroservice
+      key: MONGOUSERNAME
+  envMONGOPASSWORD:
+    name: MONGOPASSWORD
+    secretKeyRef:
+      name: listingmicroservice
+      key: MONGOPASSWORD
+
+envOfConfigmaps:
+  envMONGOPORT:
+    name: MONGOPORT
+    configMapKeyRef:
+      name: listingmicroservice
+      key: MONGOPORT
+  envHOSTNAMEMONGODB:
+    name: HOSTNAMEMONGODB
+    configMapKeyRef:
+      name: listingmicroservice
+      key: HOSTNAMEMONGODB
+
+
+hpa:
+  metadata:
+    name: listing-svcmicroservicehpa
+  spec:
+    maxReplicas: 10
+    minReplicas: 2
+  metrics:
+    pods:
+      targetAverageValue: 20
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+    memory:
+      targetAverageUtilization: 50
+  scaleTargetRef:  
+    name: listing-svc
+
+service:
+  serviceMetadata:
+    name: listing-svc
+    labels:
+      app: listing-svc
+  selector:
+    selectorName: listing-svc
+  servicePortConfiguration:
+    protocol: TCP
+    name: listing-svc
+    type: ClusterIP
+    port: 7000
+    targetPort: 7000
+
+imagestream:
+  name:  listing-svc
+  label: listing-svc
+
+buildconfig:
+  uri: "https://github.com/cumulus-airways/listing-microservice.git"
+  branch: "master"
+  name: "listing-svc"
+  imagename: "listing-svc:latest"
+  secret1: $(head -c 24 /dev/random | base64)
+  secret2: $(head -c 24 /dev/random | base64)
+
+routes:
+  host: "listing-svc-kubeapp.apps.9.30.210.207.nip.io"
+  targetPort: 7000
+  name: listing-svc
+  weight: 100
+
+nameOverride: ""
+fullnameOverride: ""

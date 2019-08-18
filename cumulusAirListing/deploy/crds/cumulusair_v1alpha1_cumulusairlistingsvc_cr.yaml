@@ -1,0 +1,12 @@
+apiVersion: cumulusbank.com/v1alpha1
+kind: CumulusAirListingSvc
+metadata:
+  name: accountsvc
+spec:
+  replicaCount: 2
+  namespace: "kubeapp"
+  mongodb: 
+    host: "mongodb.kubeapp"
+    username: "YWRtaW4="
+    password: "YWRtaW4="
+    secret: "aGVsbG8="
